@@ -4,12 +4,13 @@
 \alias{zheatmap}
 \title{Clustered Heatmap}
 \usage{
-zheatmap(data, colSideBar, Rowv = TRUE, Colv = TRUE, colors = viridis(n =
-  256, alpha = 1, begin = 0, end = 1, option = "viridis"), seriate = "OLO",
-  scale = c("column", "row", "none"), scale.fun = c("scale",
-  "absolute_scale"), xtext = FALSE, ytext = TRUE, text.size = 12,
-  xtext.angle = 0, ytext.angle = 0, xtext.hjust = 0, xtext.vjust = 0,
-  ytext.hjust = 0, ytext.vjust = 0, heights, widths)
+zheatmap(data, colSideBar = NULL, Rowv = TRUE, Colv = TRUE,
+  colors = viridis(n = 256, alpha = 1, begin = 0, end = 1, option =
+  "viridis"), seriate = "OLO", scale = c("column", "row", "none"),
+  scale.fun = c("scale", "absolute_scale"), xtext = FALSE, ytext = TRUE,
+  text.size = 12, xtext.angle = 0, ytext.angle = 0, xtext.hjust = 0,
+  xtext.vjust = 0, ytext.hjust = 0, ytext.vjust = 0,
+  legend.text.size = 11, heights, widths, print = TRUE)
 }
 \arguments{
 \item{data}{a data.frame object}
@@ -48,6 +49,8 @@ option = "viridis")}
 \item{ytext.vjust}{numeric}
 
 \item{heights}{numeric vector with length of 2}
+
+\item{print}{logic, whether to print the heatmap out or not. Default is TRUE and if FALSE, a grob object will be returned}
 
 \item{scaled}{A character value indicates whether the data should be scaled
 column wise or row wise, or not scaled.}

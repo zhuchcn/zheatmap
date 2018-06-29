@@ -7,8 +7,8 @@ Maintainer: Chenghao ZHu <chhzhu@ucdavis.edu>
 Description: A simple package with a single function to make heatmap with dendrograms
 License: What license is it under?
 Imports:
-    magrittr,
     ggplot2,
+    magrittr,
     ggdendro,
     grid,
     gridExtra,

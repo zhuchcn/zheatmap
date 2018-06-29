@@ -30,35 +30,41 @@
 #' @param ytext.vjust numeric
 #' @param heights numeric vector with length of 2
 #' @param width numeric vector with length of 2
+#' @param print logic, whether to print the heatmap out or not. Default is TRUE and if FALSE, a grob object will be returned
 #' @author Chenghao Zhu
 #' @import ggplot2
 #' @import ggdendro
 #' @import grid
-#' @import gridExtra
 #' @import seriation
 #' @import viridisLite
+#' @import dplyr
+#' @import tibble
+#' @import reshape2
 #' @importFrom magrittr "%>%"
+#' @importFrom gridExtra "arrangeGrob"
 #' @export
 zheatmap = function(data,
-                    colSideBar,
-                    Rowv        = TRUE,
-                    Colv        = TRUE,
-                    colors      = viridis(n = 256, alpha = 1, begin = 0,
+                    colSideBar       = NULL,
+                    Rowv             = TRUE,
+                    Colv             = TRUE,
+                    colors           = viridis(n = 256, alpha = 1, begin = 0,
                                           end = 1, option = "viridis"),
-                    seriate     = "OLO",
-                    scale       = c("column", "row", "none"),
-                    scale.fun   = c("scale", "absolute_scale"),
-                    xtext       = FALSE,
-                    ytext       = TRUE,
-                    text.size   = 12,
-                    xtext.angle = 0,
-                    ytext.angle = 0,
-                    xtext.hjust = 0,
-                    xtext.vjust = 0,
-                    ytext.hjust = 0,
-                    ytext.vjust = 0,
+                    seriate          = "OLO",
+                    scale            = c("column", "row", "none"),
+                    scale.fun        = c("scale", "absolute_scale"),
+                    xtext            = FALSE,
+                    ytext            = TRUE,
+                    text.size        = 12,
+                    xtext.angle      = 0,
+                    ytext.angle      = 0,
+                    xtext.hjust      = 0,
+                    xtext.vjust      = 0,
+                    ytext.hjust      = 0,
+                    ytext.vjust      = 0,
+                    legend.text.size = 11,
                     heights,
-                    widths){
+                    widths,
+                    print            = TRUE){
     if(missing(data)) stop("Data is missing", call. = FALSE)
 
     scale     = match.arg(scale)
@@ -138,8 +144,9 @@ zheatmap = function(data,
     g.hm = ggplotGrob(p.hm)
 
     # column side barplot for annotation
-    if(!missing(colSideBar)){
-        p.colSideBar = sider_barplot(x = colSideBar, col.id = colInd)
+    if(!is.null(colSideBar)){
+        p.colSideBar = sider_barplot(x = colSideBar, col.id = colInd,
+                                     legend.text.size = legend.text.size)
         # get the legend
         p.colbar.legend = get_legend(p.colSideBar)
         # remove the legend from the side bar
@@ -174,7 +181,7 @@ zheatmap = function(data,
     if(Rowv){
         g.Rowv$heights = maxHeight
     }
-    if(!missing(colSideBar)){
+    if(!is.null(colSideBar)){
         g.colbar$widths = maxWidth
     }
 
@@ -185,7 +192,7 @@ zheatmap = function(data,
     if(!Rowv) g.Rowv = g.ph
 
     if(Colv){
-        if(!missing(colSideBar)){
+        if(!is.null(colSideBar)){
             top.panel = arrangeGrob(
                 grobs = list(g.Colv, g.colbar),
                 heights = c(heights[1], heights[2]/nrow(data))
@@ -224,11 +231,13 @@ zheatmap = function(data,
         )
     }
 
-    grid.arrange(
+    p = arrangeGrob(
         grobs = list(left.panel, right.panel),
         widths = widths
     )
 
+    if(!print) return(p)
+    grid.draw(p)
 }
 ################################################################################
 #' @keywords internal
@@ -264,13 +273,13 @@ heatmap_main = function(data,
 
     col.pal = colorRampPalette(colors)(256)
 
-    df = data[rowInd, colInd] %>%
+    df = data[row.id, col.id] %>%
         rownames_to_column("Feature") %>%
         melt(id.var = "Feature",
              variable.name = "Sample",
              value.name = "Abundance") %>%
         mutate(Sample = factor(Sample, levels = colnames(data)[rev(col.id)]),
-               Feature = factor(Feature, levels=rownames(df)[rev(row.id)]))
+               Feature = factor(Feature, levels=rownames(data)[rev(row.id)]))
 
     p = ggplot(df, aes(Sample, Feature)) +
         geom_tile(aes(fill=Abundance)) +
@@ -318,7 +327,7 @@ heatmap_main = function(data,
 }
 ################################################################################
 #' @keywords internal
-sider_barplot = function(x, col.id){
+sider_barplot = function(x, col.id, legend.text.size){
 
     data = data.frame(group = x)
     data$x = 1:length(data$group)
@@ -336,7 +345,7 @@ sider_barplot = function(x, col.id){
             axis.ticks = element_blank(),
             # legend
             legend.title = element_blank(),
-            legend.text = element_text(size=15),
+            legend.text = element_text(size=legend.text.size),
             # margin
             plot.margin = margin(0,0,0,0)
         )
