@@ -1,35 +1,21 @@
----
-output:
-  md_document:
-    variant: markdown_github
----
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
-)
-```
-
-# zheatmap
+zheatmap
+========
 
 This is a package that makes heatmap with dendrograms. To install the package, use the commands below:
 
-```{r install, eval=FALSE}
+``` r
 devtools::install_github("zhuchcn/zheatmap")
 ```
 
 Basic usage:
 
-```{r usage, eval=FALSE}
+``` r
 zheatmap(data)
 ```
 
 See documentation:
 
-```{r help, eval=FALSE}
+``` r
 ?zheatmap
 ```
