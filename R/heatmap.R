@@ -62,8 +62,12 @@
 #'
 #' # Don't show the column wise dendrogram
 #' zheatmap(mtcars, Colv = F)
+#'
+#' # Use color side bar to annotate
+#' zheatmap(mtcars[,-2], rowSideBar = factor(mtcars$cyl))
 zheatmap = function(data,
                     colSideBar       = NULL,
+                    rowSideBar       = NULL,
                     Rowv             = TRUE,
                     Colv             = TRUE,
                     colors           = viridis(n = 256, alpha = 1, begin = 0,
@@ -80,11 +84,13 @@ zheatmap = function(data,
                     xtext.vjust      = 0,
                     ytext.hjust      = 1,
                     ytext.vjust      = 0,
-                    legend.text.size = 7,
+                    legend.text.size = 9,
                     heights,
                     widths,
                     print            = TRUE){
     if(missing(data)) stop("Data is missing", call. = FALSE)
+
+    ## ---------- Step 1. Scale ----------------------------------
 
     scale     = match.arg(scale)
     scale.fun = match.arg(scale.fun)
@@ -115,13 +121,15 @@ zheatmap = function(data,
         rownames(data) = rownames; colnames(data) = colnames
     }else if(scale != "none") stop("scale input invalid")
 
+    ## ---------- Step 2. Subplots -------------------------------
+
     # color range
     data.max = max(as.matrix(data))
     data.min = min(as.matrix(data))
     max.real = max(abs(data.max), abs(data.min))
     color.range = c(- max.real, max.real)
 
-    # make the basic dendrogram
+    # Basic dendrogram
     if(Rowv){
         dend.row = dendrogram_basic(data, row.wise = TRUE,  seriate = seriate)
         rowInd = order.dendrogram(dend.row)
@@ -162,98 +170,132 @@ zheatmap = function(data,
                         ytext.vjust = ytext.vjust)
     g.hm = ggplotGrob(p.hm)
 
-    # column side barplot for annotation
+    # column side barplot
     if(!is.null(colSideBar)){
-        p.colSideBar = sider_barplot(x = colSideBar, col.id = colInd,
+        p.colSideBar = side_barplot(x = colSideBar, id = colInd,
+                                     vertical = FALSE,
                                      legend.text.size = legend.text.size)
         # get the legend
-        p.colbar.legend = get_legend(p.colSideBar)
+        g.colbar.legend = get_legend(p.colSideBar)
         # remove the legend from the side bar
         p.colSideBar = p.colSideBar + theme(legend.position = "none")
         g.colbar = ggplotGrob(p.colSideBar)
     }else{
         g.colbar = NULL
-        p.colbar.legend = NULL
+        g.colbar.legend = NULL
+    }
+
+    # row side barplot
+    if(!is.null(rowSideBar)){
+        p.rowSideBar = side_barplot(x = rowSideBar, id = rowInd,
+                                    vertical = TRUE,
+                                    legend.text.size = legend.text.size)
+        # get the legend
+        g.rowbar.legend = get_legend(p.rowSideBar)
+        # remove the legend from the side bar
+        p.rowSideBar = p.rowSideBar + theme(legend.position = "none")
+        g.rowbar = ggplotGrob(p.rowSideBar)
+    }else{
+        g.rowbar = NULL
+        g.rowbar.legend = NULL
     }
 
     # color key plot
     g.colorkey = plot_colorkey(color.range = color.range,
                                colors      = colors,
-                               text.size   = text.size)
+                               text.size   = legend.text.size)
 
     # g.ph is a empty place holder
     g.ph = ggplotGrob(ggplot() + theme_classic())
+
+    ## ---------- Step 3. Align ----------------------------------
 
     # align subplots
     col_list = list(g.hm$widths, g.Colv$widths, g.colbar$widths)
     maxWidth = do.call(unit.pmax, col_list)
 
-    row_list = list(g.hm$heights, g.Rowv$heights)
+    row_list  = list(g.hm$heights, g.Rowv$heights, g.rowbar$heights)
     maxHeight = do.call(unit.pmax, row_list)
 
     g.hm$heights = maxHeight
-    g.hm$widths = maxWidth
-    if(Colv){
-        g.Colv$widths = maxWidth
-    }
-    if(Rowv){
-        g.Rowv$heights = maxHeight
-    }
-    if(!is.null(colSideBar)){
-        g.colbar$widths = maxWidth
-    }
+    g.hm$widths  = maxWidth
+
+    # align legends
+    legend.col_list = list(g.colorkey$widths,
+                           g.rowbar.legend$widths,
+                           g.colbar.legend$widths)
+    legend.widths = do.call(unit.pmax, legend.col_list)
+
+    ## ---------- Step 4. Arrange --------------------------------
 
     # heights and widths
     if(missing(heights)) heights = c( max(nrow(data)/6, 3), nrow(data) )
     if(missing(widths))  widths  = c( ncol(data), max(ncol(data)/6, 3) )
 
-    if(!Rowv) g.Rowv = g.ph
+    legend.list = list()
+    g.colorkey$widths = legend.widths
+    legend.list$colorkey = g.colorkey
 
     if(Colv){
+        g.Colv$widths    = maxWidth
+
         if(!is.null(colSideBar)){
+            g.colbar$widths  = maxWidth
             top.panel = arrangeGrob(
                 grobs = list(g.Colv, g.colbar),
                 heights = c(heights[1], heights[2]/nrow(data))
             )
+            g.colbar.legend$widths = legend.widths
+            legend.list$colbar = g.colbar.legend
         }else{
             top.panel = g.Colv
-            p.colbar.legend = g.ph
         }
-        # left panel
-        left.panel = arrangeGrob(
+        # main panel
+        main.panel = arrangeGrob(
             grobs = list(top.panel, g.hm),
             heights = heights
         )
-        # corner panel
-        corner.panel = arrangeGrob(
-            grobs = list(g.colorkey, p.colbar.legend),
-            heights = c(1,1)
-        )
-        # right.panel
-        right.panel = arrangeGrob(
-            grobs = list(corner.panel, g.Rowv),
-            heights = heights
-        )
     }else{
-        #left panel
-        left.panel = arrangeGrob(
-            grobs = list(g.ph, g.colorkey, g.hm),
-            heights = c(3, nrow(data)),
-            widths = c(2, 1),
-            layout_matrix = rbind(c(1,2), c(3,3))
-        )
-        #right panel
-        right.panel = arrangeGrob(
-            grobs = list(g.ph, g.Rowv),
-            heights = c(3, nrow(data))
-        )
+        # main panel
+        main.panel = g.hm
+        legend.list = list(g.colorkey)
     }
 
+    if(Rowv){
+        g.Rowv$heights   = maxHeight
+
+        if(!is.null(rowSideBar)){
+            g.rowbar$heights = maxHeight
+            row.panel = arrangeGrob(
+                grobs = list(g.rowbar, g.Rowv),
+                widths = c(widths[1]/ncol(data), widths[2])
+            )
+            g.rowbar.legend$widths = legend.widths
+            legend.list$rowbar = g.rowbar.legend
+        }else{
+            row.panel = g.Rowv
+        }
+        p = arrangeGrob(
+            grobs = list(main.panel, g.ph, row.panel),
+            heights = heights,
+            widths = widths,
+            layout_matrix = cbind(c(1,1),
+                                  c(2,3))
+        )
+    }else{
+        p = main.panel
+    }
+
+    legend.panel = arrangeGrob(
+        grobs = legend.list
+    )
+
     p = arrangeGrob(
-        grobs = list(left.panel, right.panel),
-        widths = widths
+        grobs = list(p, legend.panel),
+        widths = c(sum(widths), 2)
     )
 
     if(!print) return(p)
+    grid.newpage()
     grid.draw(p)
 }

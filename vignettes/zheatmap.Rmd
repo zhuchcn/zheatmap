@@ -1,0 +1,36 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE, message = FALSE
+)
+```
+
+The zheatmap package only contains a single function zheatmap to generate a clustered heatmap plot. The mtcars dataset from the dataset package is used as an example here for demostration. The mtcars dataset hase 32 rows and 11 columns.
+
+```{r}
+head(mtcars)
+cars = mtcars[,-2]
+```
+
+The default 
+
+```{r}
+library(zheatmap)
+zheatmap(cars)
+```
+
+```{r}
+zheatmap(t(cars), scale="row", colSideBar = as.factor(mtcars[,2]))
+```

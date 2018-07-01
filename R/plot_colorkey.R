@@ -19,7 +19,6 @@ plot_colorkey = function(color.range, colors, text.size){
                              name="",breaks=c(color.range[1],color.range[2]),
                              labels = c("low", "high"),
                              guide = guide_colorbar(
-                                 direction = "horizontal",
                                  label.theme = element_text(size = text.size)
                              ))
     g = get_legend(p)

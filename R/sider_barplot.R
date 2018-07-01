@@ -8,14 +8,17 @@
 #' heatmap.
 #' @param legend.text.size numeric indicates the legend text size.
 #' @keywords internal
-sider_barplot = function(x, col.id, legend.text.size){
+side_barplot = function(x, id, vertical = F, legend.text.size=9){
 
-    data = data.frame(group = x)
-    data$x = 1:length(data$group)
-    data$y = 1
+    data = data.frame(fill = x[id]) %>%
+        mutate(x = 1:nrow(data), y = 1)
 
-    p = ggplot(data, aes(x,y)) +
-        geom_tile(aes(fill=group), color="white") +
+    if(vertical){
+        colnames(data) = c("fill", "y", "x")
+    }
+
+    p = ggplot(data, aes(x = x, y = y)) +
+        geom_tile(aes(fill=fill), color="white") +
         scale_y_continuous(expand = c(0,0)) +
         scale_x_continuous(expand=c(0,0)) +
         theme(
