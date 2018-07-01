@@ -24,8 +24,9 @@ devtools::install_github("zhuchcn/zheatmap")
 
 Basic usage:
 
-```{r usage, eval=FALSE}
-zheatmap(data)
+```{r usage, fig.height = 6, fig.width = 7, fig.align='center'}
+library(zheatmap)
+zheatmap(mtcars)
 ```
 
 See documentation:

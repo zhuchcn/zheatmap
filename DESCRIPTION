@@ -15,6 +15,11 @@ Imports:
     seriation,
     viridisLite
 Collate:
+    dendrogram_basic.R
+    dendro_plot.R
+    heatmap_main.R
+    sider_barplot.R
+    plot_colorkey.R
     heatmap.R
 Encoding: UTF-8
 LazyData: true

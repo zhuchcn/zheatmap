@@ -13,7 +13,9 @@
 #' @param colors a character vector off colors to use. The default uses
 #' \code{\link{viridis}}(n=256, alpha = 1, begin = 0, end = 1,
 #' option = "viridis")
-#' @param seriate character. See \code{\link{seriate}}
+#' @param seriate character indicates the method to use to calculate the dist.
+#' Usful methods include "OLO", "GW", and "HC". See \code{\link{seriate}} for
+#' more detail
 #' @param scaled A character value indicates whether the data should be scaled
 #' column wise or row wise, or not scaled.
 #' @param scale.fun the scale function to use. When using "scale" the
@@ -22,7 +24,7 @@
 #' @param xtext logic whether to show x axis labels
 #' @param ytext logic whether to show y axis labels
 #' @param xtext.angle numeric
-#' @param xtext.angle numeric
+#' @param ytext.angle numeric
 #' @param text.size numeric
 #' @param xtext.hjust numeric
 #' @param xtext.vjust numeric
@@ -43,6 +45,23 @@
 #' @importFrom magrittr "%>%"
 #' @importFrom gridExtra "arrangeGrob"
 #' @export
+#' @examples
+#' # mtcars
+#' zheatmap(mtcars)
+#'
+#' # show x axis texts and rotate them 90 degree
+#' zheatmap(t(mtcars), scale = "row", xtext.angle = 90)
+#'
+#' # change the color
+#' library(RColorBrewer)
+#' my_colors = colorRampPalette(rev(brewer.pal(11, "RdBu")))(256)
+#' zheatmap(mtcars, colors = my_colors)
+#'
+#' # use hierachical clustring method
+#' zheatmap(mtcars, seriate = "HC")
+#'
+#' # Don't show the column wise dendrogram
+#' zheatmap(mtcars, Colv = F)
 zheatmap = function(data,
                     colSideBar       = NULL,
                     Rowv             = TRUE,
@@ -57,11 +76,11 @@ zheatmap = function(data,
                     text.size        = 12,
                     xtext.angle      = 0,
                     ytext.angle      = 0,
-                    xtext.hjust      = 0,
+                    xtext.hjust      = 1,
                     xtext.vjust      = 0,
-                    ytext.hjust      = 0,
+                    ytext.hjust      = 1,
                     ytext.vjust      = 0,
-                    legend.text.size = 11,
+                    legend.text.size = 7,
                     heights,
                     widths,
                     print            = TRUE){
@@ -107,7 +126,7 @@ zheatmap = function(data,
         dend.row = dendrogram_basic(data, row.wise = TRUE,  seriate = seriate)
         rowInd = order.dendrogram(dend.row)
         # row wise dendrogram
-        p.Rowv = dendro.plot(dend.row, rotate = T, x.expand = 1/(length(rowInd) * 2))
+        p.Rowv = dendro_plot(dend.row, rotate = T, x.expand = 1/(length(rowInd) * 2))
         g.Rowv = ggplotGrob(p.Rowv)
     }else{
         rowInd = 1:nrow(data)
@@ -118,7 +137,7 @@ zheatmap = function(data,
         dend.col = dendrogram_basic(data, row.wise = FALSE, seriate = seriate)
         colInd = order.dendrogram(dend.col)
         # column wise dendrogram
-        p.Colv = dendro.plot(dend.col, x.expand = 1/(length(colInd) * 2))
+        p.Colv = dendro_plot(dend.col, x.expand = 1/(length(colInd) * 2))
         g.Colv = ggplotGrob(p.Colv)
     }else{
         colInd = 1:ncol(data)
@@ -158,10 +177,9 @@ zheatmap = function(data,
     }
 
     # color key plot
-    p.colorkey = plot_colorkey(color.range = color.range,
+    g.colorkey = plot_colorkey(color.range = color.range,
                                colors      = colors,
                                text.size   = text.size)
-    g.colorkey = ggplotGrob(p.colorkey)
 
     # g.ph is a empty place holder
     g.ph = ggplotGrob(ggplot() + theme_classic())
@@ -220,14 +238,14 @@ zheatmap = function(data,
         #left panel
         left.panel = arrangeGrob(
             grobs = list(g.ph, g.colorkey, g.hm),
-            heights = c(2, nrow(data)),
-            widths = c(ncol(data), ncol(data)/5),
+            heights = c(3, nrow(data)),
+            widths = c(2, 1),
             layout_matrix = rbind(c(1,2), c(3,3))
         )
         #right panel
         right.panel = arrangeGrob(
             grobs = list(g.ph, g.Rowv),
-            heights = c(2, nrow(data))
+            heights = c(3, nrow(data))
         )
     }
 
@@ -239,168 +257,3 @@ zheatmap = function(data,
     if(!print) return(p)
     grid.draw(p)
 }
-################################################################################
-#' @keywords internal
-dendrogram_basic = function(data, row.wise = TRUE, seriate = "OLO"){
-    if(!row.wise){
-        data = as.data.frame(t(data))
-    }
-    dist = dist(data)
-    hc = hclust(dist)
-    o = seriation::seriate(dist, method = seriate, control = list(hclust=hc))
-    dend = as.dendrogram(hc)
-    dend = dendextend::rotate(dend, order = rev(labels(dist)[seriation::get_order(o)]))
-    return(dend)
-}
-
-################################################################################
-#' @keywords internal
-heatmap_main = function(data,
-                        row.id,
-                        col.id,
-                        color.range,
-                        colors,
-                        xtext = FALSE,
-                        ytext = TRUE,
-                        text.size = 12,
-                        xtext.angle = 0,
-                        ytext.angle = 0,
-                        xtext.hjust = 0,
-                        xtext.vjust = 0,
-                        ytext.hjust = 0,
-                        ytext.vjust = 0
-                        ){
-
-    col.pal = colorRampPalette(colors)(256)
-
-    df = data[row.id, col.id] %>%
-        rownames_to_column("Feature") %>%
-        melt(id.var = "Feature",
-             variable.name = "Sample",
-             value.name = "Abundance") %>%
-        mutate(Sample = factor(Sample, levels = colnames(data)[rev(col.id)]),
-               Feature = factor(Feature, levels=rownames(data)[rev(row.id)]))
-
-    p = ggplot(df, aes(Sample, Feature)) +
-        geom_tile(aes(fill=Abundance)) +
-        scale_x_discrete(expand = c(0,0)) +
-        scale_y_discrete(expand = c(0,0)) +
-        scale_fill_gradientn(
-            colours = colorRampPalette(colors)(256),
-            limits = color.range
-        ) +
-        labs(x="",y="") +
-        theme(
-            # legend:
-            legend.position = "none",
-            # axis:
-            axis.title = element_blank(),
-            axis.line = element_blank(),
-            # margin
-            plot.margin = margin(t = 0, r = 0)
-        )
-
-    if(xtext){
-        p = p + theme(
-            axis.text.x = element_text(size = text.size, angle = xtext.angle,
-                                       hjust = xtext.hjust, vjust = xtext.vjust)
-        )
-    }else{
-        p = p + theme(
-            axis.text.x = element_blank(),
-            axis.ticks.x = element_blank()
-        )
-    }
-
-    if(ytext){
-        p = p + theme(
-            axis.text.y = element_text(size = text.size, angle = ytext.angle,
-                                       hjust = ytext.hjust, vjust = ytext.vjust)
-        )
-    }else{
-        p = p + theme(
-            axis.text.y = element_blank(),
-            axis.ticks.y = element_blank()
-        )
-    }
-    return(p)
-}
-################################################################################
-#' @keywords internal
-sider_barplot = function(x, col.id, legend.text.size){
-
-    data = data.frame(group = x)
-    data$x = 1:length(data$group)
-    data$y = 1
-
-    p = ggplot(data, aes(x,y)) +
-        geom_tile(aes(fill=group), color="white") +
-        scale_y_continuous(expand = c(0,0)) +
-        scale_x_continuous(expand=c(0,0)) +
-        theme(
-            # axis
-            axis.line = element_blank(),
-            axis.text = element_blank(),
-            axis.title = element_blank(),
-            axis.ticks = element_blank(),
-            # legend
-            legend.title = element_blank(),
-            legend.text = element_text(size=legend.text.size),
-            # margin
-            plot.margin = margin(0,0,0,0)
-        )
-    return(p)
-}
-################################################################################
-#' @keywords internal
-dendro.plot = function(dend, rotate = FALSE, x.expand){
-    ggdendro::ggdendrogram(dend, labels=F, rotate = rotate, theme_dendro=T) +
-        scale_y_continuous(expand=c(0,0)) +
-        scale_x_continuous(expand = c(x.expand,0)) +
-        labs(x="",y="") +
-        theme(
-            # axis
-            axis.text.x = element_blank(),
-            axis.text.y = element_blank(),
-            axis.title.x = element_blank(),
-            axis.title.y = element_blank(),
-            #margin
-            plot.margin = margin(0,0,0,0)
-        )
-}
-################################################################################
-#' @keywords internal
-plot_colorkey = function(color.range, colors, text.size){
-    key.mat = data.frame(
-        x = seq(color.range[1], color.range[2], length.out = 256),
-        y = rep(1,256)
-    )
-
-    p_colorkey = ggplot(key.mat,aes(x,y)) +
-        geom_tile(aes(fill=x)) +
-        scale_fill_gradientn(colours = colors,
-                             limits = color.range) +
-        scale_x_continuous(name="",breaks=c(color.range[1],0,color.range[2]),
-                           labels = c("low", 0, "high")) +
-        labs(x="",y="") +
-        theme_bw() +
-        theme(
-            # panel
-            panel.border = element_blank(),
-            panel.grid = element_blank(),
-            # legend
-            legend.position = "none",
-            # axis
-            axis.line.y = element_blank(),
-            axis.text.y = element_blank(),
-            axis.ticks.y = element_blank(),
-            axis.text.x = element_text(size=text.size)
-        )
-}
-################################################################################
-#' @keywords internal
-get_legend<-function(a.gplot){
-    tmp <- ggplot_gtable(ggplot_build(a.gplot))
-    leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-    legend <- tmp$grobs[[leg]]
-    return(legend)}
