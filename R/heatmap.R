@@ -16,7 +16,7 @@
 #' @param seriate character indicates the method to use to calculate the dist.
 #' Usful methods include "OLO", "GW", and "HC". See \code{\link{seriate}} for
 #' more detail
-#' @param scaled A character value indicates whether the data should be scaled
+#' @param scale A character value indicates whether the data should be scaled
 #' column wise or row wise, or not scaled.
 #' @param scale.fun the scale function to use. When using "scale" the
 #' \code{\link{scale}} from base package will be used. When using
@@ -293,7 +293,7 @@ zheatmap = function(data,
 
     p = arrangeGrob(
         grobs = list(p, legend.panel),
-        widths = c(sum(widths), 2)
+        widths = c(sum(widths), sum(widths)/6)
     )
 
     if(!print) return(p)

@@ -2,7 +2,7 @@
 zheatmap
 ========
 
-This is a package that makes heatmap with dendrograms. To install the package, use the commands below:
+This is a package that makes heatmaps with dendrograms. To install the package, use the commands below:
 
 ``` r
 devtools::install_github("zhuchcn/zheatmap")
@@ -17,8 +17,6 @@ zheatmap(mtcars)
 
 <img src="README-usage-1.png" style="display: block; margin: auto;" />
 
-See documentation:
+Vignette:
 
-``` r
-?zheatmap
-```
+[Introduction to zheatmap](https://zhuchcn.github.io/softwares/packages/zheatmap)

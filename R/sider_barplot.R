@@ -11,7 +11,7 @@
 side_barplot = function(x, id, vertical = F, legend.text.size=9){
 
     data = data.frame(fill = x[id]) %>%
-        mutate(x = 1:nrow(data), y = 1)
+        mutate(x = 1:length(x), y = 1)
 
     if(vertical){
         colnames(data) = c("fill", "y", "x")

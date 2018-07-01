@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 # zheatmap
 
-This is a package that makes heatmap with dendrograms. To install the package, use the commands below:
+This is a package that makes heatmaps with dendrograms. To install the package, use the commands below:
 
 ```{r install, eval=FALSE}
 devtools::install_github("zhuchcn/zheatmap")
@@ -30,8 +30,6 @@ library(zheatmap)
 zheatmap(mtcars)
 ```
 
-See documentation:
+Vignette:
 
-```{r help, eval=FALSE}
-?zheatmap
-```
+[Introduction to zheatmap](https://zhuchcn.github.io/softwares/packages/zheatmap)

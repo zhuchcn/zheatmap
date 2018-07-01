@@ -26,7 +26,7 @@ heatmap_main = function(data,
         melt(id.var = "Feature",
              variable.name = "Sample",
              value.name = "Abundance") %>%
-        mutate(Sample = factor(Sample, levels = colnames(data)[rev(col.id)]),
+        mutate(Sample = factor(Sample, levels = colnames(data)[col.id]),
                Feature = factor(Feature, levels=rownames(data)[rev(row.id)]))
 
     p = ggplot(df, aes(Sample, Feature)) +

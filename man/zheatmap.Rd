@@ -30,6 +30,9 @@ option = "viridis")}
 Usful methods include "OLO", "GW", and "HC". See \code{\link{seriate}} for
 more detail}
 
+\item{scale}{A character value indicates whether the data should be scaled
+column wise or row wise, or not scaled.}
+
 \item{scale.fun}{the scale function to use. When using "scale" the
 \code{\link{scale}} from base package will be used. When using
 "absolute_scale" each row or column will be forced between -1 and 1.}
@@ -55,9 +58,6 @@ more detail}
 \item{heights}{numeric vector with length of 2}
 
 \item{print}{logic, whether to print the heatmap out or not. Default is TRUE and if FALSE, a grob object will be returned}
-
-\item{scaled}{A character value indicates whether the data should be scaled
-column wise or row wise, or not scaled.}
 
 \item{width}{numeric vector with length of 2}
 }
