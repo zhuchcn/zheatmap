@@ -4,13 +4,13 @@
 \alias{zheatmap}
 \title{Clustered Heatmap}
 \usage{
-zheatmap(data, colSideBar = NULL, Rowv = TRUE, Colv = TRUE,
-  colors = viridis(n = 256, alpha = 1, begin = 0, end = 1, option =
-  "viridis"), seriate = "OLO", scale = c("column", "row", "none"),
+zheatmap(data, colSideBar = NULL, rowSideBar = NULL, Rowv = TRUE,
+  Colv = TRUE, colors = viridis(n = 256, alpha = 1, begin = 0, end = 1,
+  option = "viridis"), seriate = "OLO", scale = c("column", "row", "none"),
   scale.fun = c("scale", "absolute_scale"), xtext = FALSE, ytext = TRUE,
-  text.size = 12, xtext.angle = 0, ytext.angle = 0, xtext.hjust = 0,
-  xtext.vjust = 0, ytext.hjust = 0, ytext.vjust = 0,
-  legend.text.size = 11, heights, widths, print = TRUE)
+  text.size = 12, xtext.angle = 0, ytext.angle = 0, xtext.hjust = 1,
+  xtext.vjust = 0, ytext.hjust = 1, ytext.vjust = 0,
+  legend.text.size = 9, heights, widths, print = TRUE)
 }
 \arguments{
 \item{data}{a data.frame object}
@@ -26,7 +26,9 @@ side between the heatmap ans column-wize dendrogram}
 \code{\link{viridis}}(n=256, alpha = 1, begin = 0, end = 1,
 option = "viridis")}
 
-\item{seriate}{character. See \code{\link{seriate}}}
+\item{seriate}{character indicates the method to use to calculate the dist.
+Usful methods include "OLO", "GW", and "HC". See \code{\link{seriate}} for
+more detail}
 
 \item{scale.fun}{the scale function to use. When using "scale" the
 \code{\link{scale}} from base package will be used. When using
@@ -39,6 +41,8 @@ option = "viridis")}
 \item{text.size}{numeric}
 
 \item{xtext.angle}{numeric}
+
+\item{ytext.angle}{numeric}
 
 \item{xtext.hjust}{numeric}
 
@@ -55,12 +59,32 @@ option = "viridis")}
 \item{scaled}{A character value indicates whether the data should be scaled
 column wise or row wise, or not scaled.}
 
-\item{xtext.angle}{numeric}
-
 \item{width}{numeric vector with length of 2}
 }
 \description{
 A flexible heatmap function with dendrograms on both sides.
+}
+\examples{
+# using the mtcars data
+zheatmap(mtcars)
+
+# show x axis texts and rotate them 90 degree
+zheatmap(t(mtcars), scale = "row", xtext.angle = 90)
+
+# change the color
+library(RColorBrewer)
+my_colors = colorRampPalette(rev(brewer.pal(11, "RdBu")))(256)
+zheatmap(mtcars, colors = my_colors)
+
+# use hierachical clustring method
+zheatmap(mtcars, seriate = "HC")
+
+# hide the column wise dendrogram
+zheatmap(mtcars, Colv = F)
+
+# use color side bar to annotate
+zheatmap(mtcars[,-2], rowSideBar = factor(mtcars$cyl))
+
 }
 \author{
 Chenghao Zhu

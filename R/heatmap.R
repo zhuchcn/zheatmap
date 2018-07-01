@@ -44,9 +44,8 @@
 #' @import reshape2
 #' @importFrom magrittr "%>%"
 #' @importFrom gridExtra "arrangeGrob"
-#' @export
 #' @examples
-#' # mtcars
+#' # using the mtcars data
 #' zheatmap(mtcars)
 #'
 #' # show x axis texts and rotate them 90 degree
@@ -60,11 +59,13 @@
 #' # use hierachical clustring method
 #' zheatmap(mtcars, seriate = "HC")
 #'
-#' # Don't show the column wise dendrogram
+#' # hide the column wise dendrogram
 #' zheatmap(mtcars, Colv = F)
 #'
-#' # Use color side bar to annotate
+#' # use color side bar to annotate
 #' zheatmap(mtcars[,-2], rowSideBar = factor(mtcars$cyl))
+#'
+#' @export
 zheatmap = function(data,
                     colSideBar       = NULL,
                     rowSideBar       = NULL,

@@ -4,8 +4,8 @@
 #' only be called internally
 #' @param color.range numeric vector that indicates the range of x axis for the
 #' color key
-#' @colors character indicates the colors to use
-#' @text.size the size of the x axis labels.
+#' @param colors character indicates the colors to use
+#' @param text.size the size of the x axis labels.
 #' @keywords internal
 plot_colorkey = function(color.range, colors, text.size){
     key.mat = data.frame(
