@@ -4,7 +4,7 @@
 \alias{plot_colorkey}
 \title{Make a color key plot}
 \usage{
-plot_colorkey(color.range, colors, text.size)
+plot_colorkey(color.range, colors, text.size, show.legend.scale)
 }
 \arguments{
 \item{color.range}{numeric vector that indicates the range of x axis for the
@@ -13,6 +13,8 @@ color key}
 \item{colors}{character indicates the colors to use}
 
 \item{text.size}{the size of the x axis labels.}
+
+\item{show.legend.scale}{logic value whether to show scales on color key.}
 }
 \description{
 This function makes a color key plot for the heatmap. Should

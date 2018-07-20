@@ -30,6 +30,7 @@
 #' @param xtext.vjust numeric
 #' @param ytext.hjust numeric
 #' @param ytext.vjust numeric
+#' @param show.legend.scale logic value whether to show scales on color key. Default is TRUE.
 #' @param heights numeric vector with length of 2
 #' @param width numeric vector with length of 2
 #' @param print logic, whether to print the heatmap out or not. Default is TRUE and if FALSE, a grob object will be returned
@@ -67,28 +68,29 @@
 #'
 #' @export
 zheatmap = function(data,
-                    colSideBar       = NULL,
-                    rowSideBar       = NULL,
-                    Rowv             = TRUE,
-                    Colv             = TRUE,
-                    colors           = viridis(n = 256, alpha = 1, begin = 0,
+                    colSideBar        = NULL,
+                    rowSideBar        = NULL,
+                    Rowv              = TRUE,
+                    Colv              = TRUE,
+                    colors            = viridis(n = 256, alpha = 1, begin = 0,
                                           end = 1, option = "viridis"),
-                    seriate          = "OLO",
-                    scale            = c("column", "row", "none"),
-                    scale.fun        = c("scale", "absolute_scale"),
-                    xtext            = FALSE,
-                    ytext            = TRUE,
-                    text.size        = 12,
-                    xtext.angle      = 0,
-                    ytext.angle      = 0,
-                    xtext.hjust      = 1,
-                    xtext.vjust      = 0,
-                    ytext.hjust      = 1,
-                    ytext.vjust      = 0,
-                    legend.text.size = 9,
+                    seriate           = "OLO",
+                    scale             = c("column", "row", "none"),
+                    scale.fun         = c("scale", "absolute_scale"),
+                    xtext             = FALSE,
+                    ytext             = TRUE,
+                    text.size         = 12,
+                    xtext.angle       = 0,
+                    ytext.angle       = 0,
+                    xtext.hjust       = 1,
+                    xtext.vjust       = 0,
+                    ytext.hjust       = 1,
+                    ytext.vjust       = 0,
+                    legend.text.size  = 9,
+                    show.legend.scale =FALSE,
                     heights,
                     widths,
-                    print            = TRUE){
+                    print             = TRUE){
     if(missing(data)) stop("Data is missing", call. = FALSE)
 
     ## ---------- Step 1. Scale ----------------------------------
@@ -202,9 +204,10 @@ zheatmap = function(data,
     }
 
     # color key plot
-    g.colorkey = plot_colorkey(color.range = color.range,
-                               colors      = colors,
-                               text.size   = legend.text.size)
+    g.colorkey = plot_colorkey(color.range       = color.range,
+                               colors            = colors,
+                               text.size         = legend.text.size,
+                               show.legend.scale = show.legend.scale)
 
     # g.ph is a empty place holder
     g.ph = ggplotGrob(ggplot() + theme_classic())

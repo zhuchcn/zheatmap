@@ -10,7 +10,8 @@ zheatmap(data, colSideBar = NULL, rowSideBar = NULL, Rowv = TRUE,
   scale.fun = c("scale", "absolute_scale"), xtext = FALSE, ytext = TRUE,
   text.size = 12, xtext.angle = 0, ytext.angle = 0, xtext.hjust = 1,
   xtext.vjust = 0, ytext.hjust = 1, ytext.vjust = 0,
-  legend.text.size = 9, heights, widths, print = TRUE)
+  legend.text.size = 9, show.legend.scale = FALSE, heights, widths,
+  print = TRUE)
 }
 \arguments{
 \item{data}{a data.frame object}
@@ -54,6 +55,8 @@ column wise or row wise, or not scaled.}
 \item{ytext.hjust}{numeric}
 
 \item{ytext.vjust}{numeric}
+
+\item{show.legend.scale}{logic value whether to show scales on color key. Default is TRUE.}
 
 \item{heights}{numeric vector with length of 2}
 
