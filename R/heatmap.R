@@ -171,6 +171,9 @@ zheatmap = function(data,
                         xtext.vjust = xtext.vjust,
                         ytext.hjust = ytext.hjust,
                         ytext.vjust = ytext.vjust)
+    if(!Colv)
+        p.hm = p.hm + theme(plot.margin = margin(t=3))
+
     g.hm = ggplotGrob(p.hm)
 
     # column side barplot
@@ -296,7 +299,8 @@ zheatmap = function(data,
 
     p = arrangeGrob(
         grobs = list(p, legend.panel),
-        widths = c(sum(widths), sum(widths)/6)
+        widths = c(sum(widths), max(sum(widths)/6,2)),
+        vp = viewport(width = unit(0.95, "npc"), height = unit(0.95, "npc"))
     )
 
     if(!print) return(p)
