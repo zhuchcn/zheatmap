@@ -31,6 +31,10 @@
 #' @param ytext.hjust numeric
 #' @param ytext.vjust numeric
 #' @param show.legend.scale logic value whether to show scales on color key. Default is TRUE.
+#' @param show.value bolean, whether show values on heatmap
+#' @param value.cutoff numeric, length bust be 2. All values beyond this range
+#' @param value.size numeric, the size of values to display
+#' will displayed as "< ..." or "> ..."
 #' @param heights numeric vector with length of 2
 #' @param width numeric vector with length of 2
 #' @param print logic, whether to print the heatmap out or not. Default is TRUE and if FALSE, a grob object will be returned
@@ -74,6 +78,8 @@ zheatmap = function(data,
                     Colv              = TRUE,
                     colors            = viridis(n = 256, alpha = 1, begin = 0,
                                           end = 1, option = "viridis"),
+                    line.color        = "white",
+                    line.size         = 0,
                     seriate           = "OLO",
                     scale             = c("column", "row", "none"),
                     scale.fun         = c("scale", "absolute_scale"),
@@ -87,11 +93,16 @@ zheatmap = function(data,
                     ytext.hjust       = 1,
                     ytext.vjust       = 0,
                     legend.text.size  = 9,
-                    show.legend.scale =FALSE,
+                    show.legend.scale = FALSE,
+                    show.value        = FALSE,
+                    text.data         = NULL,
+                    text.value.size   = text.size,
+                    text.value.cutoff = c(-Inf, Inf),
                     heights,
                     widths,
                     print             = TRUE){
     if(missing(data)) stop("Data is missing", call. = FALSE)
+    data = as.data.frame(data)
 
     ## ---------- Step 1. Scale ----------------------------------
 
@@ -162,6 +173,8 @@ zheatmap = function(data,
                         col.id      = colInd,
                         color.range = color.range,
                         colors      = colors,
+                        line.color  = line.color,
+                        line.size   = line.size,
                         xtext       = xtext,
                         ytext       = ytext,
                         text.size   = text.size,
@@ -170,7 +183,11 @@ zheatmap = function(data,
                         xtext.hjust = xtext.hjust,
                         xtext.vjust = xtext.vjust,
                         ytext.hjust = ytext.hjust,
-                        ytext.vjust = ytext.vjust)
+                        ytext.vjust = ytext.vjust,
+                        show.value = show.value,
+                        text.data  = text.data,
+                        text.value.size = text.value.size,
+                        text.value.cutoff = text.value.cutoff)
     if(!Colv)
         p.hm = p.hm + theme(plot.margin = margin(t=3))
 
@@ -213,7 +230,7 @@ zheatmap = function(data,
                                show.legend.scale = show.legend.scale)
 
     # g.ph is a empty place holder
-    g.ph = ggplotGrob(ggplot() + theme_classic())
+    g.ph = grob()
 
     ## ---------- Step 3. Align ----------------------------------
 

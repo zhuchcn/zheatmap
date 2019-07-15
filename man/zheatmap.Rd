@@ -6,12 +6,14 @@
 \usage{
 zheatmap(data, colSideBar = NULL, rowSideBar = NULL, Rowv = TRUE,
   Colv = TRUE, colors = viridis(n = 256, alpha = 1, begin = 0, end = 1,
-  option = "viridis"), seriate = "OLO", scale = c("column", "row", "none"),
-  scale.fun = c("scale", "absolute_scale"), xtext = FALSE, ytext = TRUE,
-  text.size = 12, xtext.angle = 0, ytext.angle = 0, xtext.hjust = 1,
-  xtext.vjust = 0, ytext.hjust = 1, ytext.vjust = 0,
-  legend.text.size = 9, show.legend.scale = FALSE, heights, widths,
-  print = TRUE)
+  option = "viridis"), line.color = "white", line.size = 0,
+  seriate = "OLO", scale = c("column", "row", "none"),
+  scale.fun = c("scale", "absolute_scale"), xtext = FALSE,
+  ytext = TRUE, text.size = 12, xtext.angle = 0, ytext.angle = 0,
+  xtext.hjust = 1, xtext.vjust = 0, ytext.hjust = 1,
+  ytext.vjust = 0, legend.text.size = 9, show.legend.scale = FALSE,
+  show.value = FALSE, text.data = NULL, text.value.size = text.size,
+  text.value.cutoff = c(-Inf, Inf), heights, widths, print = TRUE)
 }
 \arguments{
 \item{data}{a data.frame object}
@@ -58,9 +60,16 @@ column wise or row wise, or not scaled.}
 
 \item{show.legend.scale}{logic value whether to show scales on color key. Default is TRUE.}
 
+\item{show.value}{bolean, whether show values on heatmap}
+
 \item{heights}{numeric vector with length of 2}
 
 \item{print}{logic, whether to print the heatmap out or not. Default is TRUE and if FALSE, a grob object will be returned}
+
+\item{value.cutoff}{numeric, length bust be 2. All values beyond this range}
+
+\item{value.size}{numeric, the size of values to display
+will displayed as "< ..." or "> ..."}
 
 \item{width}{numeric vector with length of 2}
 }

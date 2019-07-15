@@ -4,9 +4,12 @@
 \alias{heatmap_main}
 \title{Make the main part of the heatmap}
 \usage{
-heatmap_main(data, row.id, col.id, color.range, colors, xtext = FALSE,
-  ytext = TRUE, text.size = 12, xtext.angle = 0, ytext.angle = 0,
-  xtext.hjust = 0, xtext.vjust = 0, ytext.hjust = 0, ytext.vjust = 0)
+heatmap_main(data, row.id, col.id, color.range, colors,
+  line.color = "white", line.size = 0, xtext = FALSE, ytext = TRUE,
+  text.size = 12, xtext.angle = 0, ytext.angle = 0,
+  xtext.hjust = 0, xtext.vjust = 0, ytext.hjust = 0,
+  ytext.vjust = 0, show.value = FALSE, text.data = NULL,
+  text.value.size = text.size, text.value.cutoff = c(-Inf, Inf))
 }
 \description{
 This function makes the major part of the heatmap. Should only
